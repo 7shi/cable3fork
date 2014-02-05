@@ -17,3 +17,11 @@ cable3 is licensed under a [Creative Commons Attribution-ShareAlike 3.0 Unported
 原作者による難読化を行っていないソースが公開されています。
 
 * [8086tiny: a tiny PC emulator/virtual machine](http://www.megalith.co.uk/8086tiny/)
+
+
+cable3fork2
+===========
+
+解読結果に基づいて改造を行っています。
+
+* [cable3fork2](https://bitbucket.org/7shi/cable3fork2)
