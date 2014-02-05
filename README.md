@@ -7,5 +7,4 @@ Original License
 
 Copyright 2013, Adrian Cable (adrian.cable@gmail.com)
 
-cable3 is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
-http://creativecommons.org/licenses/by-sa/3.0/
+cable3 is licensed under a [Creative Commons Attribution-ShareAlike 3.0 Unported License](http://creativecommons.org/licenses/by-sa/3.0/).
