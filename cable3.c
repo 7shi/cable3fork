@@ -468,14 +468,13 @@ main(int argc, char *argv[])
 				tmp = ~(-2 * DF) * ~oprsz;
 				if (!(oprtype & 1))
 					SI += tmp;
-				if (!(oprtype & 2)) {
+				if (!(oprtype & 2))
 					DI += tmp;
-					if (rep && --CX) {
-						rep++;
-						if (hassegpfx)
-							hassegpfx++;
-						ip--;
-					};
+				if (rep && --CX) {
+					rep++;
+					if (hassegpfx)
+						hassegpfx++;
+					ip--;
 				}
 			}
 			break;
