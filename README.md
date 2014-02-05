@@ -8,7 +8,7 @@
 
 原作者による難読化を行っていないソースが公開されています。
 
-* [8086tiny](http://www.megalith.co.uk/8086tiny/)
+* [8086tiny: a tiny PC emulator/virtual machine](http://www.megalith.co.uk/8086tiny/)
 
 
 Original License
