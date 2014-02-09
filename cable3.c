@@ -174,9 +174,9 @@ main(int argc, char *argv[])
 			break;
 		ioport[32] = 0;
 		--ioport[64];
-		uint8_t *p = &mem[16 * CS + ip];
-		oprsz = p[0] & 1;
-		int o0 = p[0] & 7, dir = p[0] / 2 & 1;
+		uint8_t *p = &mem[16 * CS + ip], b = *p;
+		oprsz = b & 1;
+		int o0 = b & 7, dir = b / 2 & 1;
 		uint32_t w1 = *(int16_t *) &p[1];
 		uint32_t w2 = *(int16_t *) &p[2];
 		uint32_t w3 = *(int16_t *) &p[3];
@@ -195,17 +195,17 @@ main(int argc, char *argv[])
 			rep--;
 		uint32_t addr = modrm(mode, rm, disp), opr1, opr2;
 		getoprs(dir, reg, addr, &opr1, &opr2);
-		optype = lookup(51, p[0]);
+		optype = lookup(51, b);
 		uint8_t oprtype = lookup(14, optype);
 		switch (lookup(8, optype)) {
 			int tmp, tmp2;
 			uint32_t utmp;
 		case 0:	/* conditional jump, enter?, leave?, int1? */
-			tmp = p[0] / 2 & 7;
+			tmp = b / 2 & 7;
 			ip += (int8_t) w1 *(oprsz ^ (r8[lookup(21, tmp)] | r8[lookup(22, tmp)] | r8[lookup(23, tmp)] ^ r8[lookup(24, tmp)]));
 			break;
 		case 1:	/* mov */
-			oprsz = p[0] & 8;
+			oprsz = b & 8;
 			tmp = regmap(o0);
 			POKE(mem[tmp], =, w1);
 			break;
