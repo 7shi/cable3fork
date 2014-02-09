@@ -78,6 +78,12 @@ lookup(int no, int offset)
 	return mem[table[no] + offset];
 }
 
+int
+isneg(int v)
+{
+	return (oprsz ? (int16_t) v : (int8_t) v) < 0;
+}
+
 void
 setafof(void)
 {
@@ -370,7 +376,7 @@ main(int argc, char *argv[])
 			POKE(mem[opr2], =, mem[opr1]);
 			break;
 		case 12:	/* rcl, rol, ror, rcl, rcr, shl, sal, shr, sar */
-			utmp = (1 & (oprsz ? *(int16_t *) &mem[addr] : mem[addr]) >> 8 * -~oprsz - 1);
+			utmp = isneg(*(int16_t *) &mem[addr]);
 			/* oprtype = 0, 1 */
 			if (tmp = oprtype ? ++ip, (int8_t) disp : dir ? 31 & CL : 1) {
 				if (o1b < 4) {
@@ -389,30 +395,30 @@ main(int argc, char *argv[])
 			switch (o1b) {
 			case 0:/* rol */
 				POKE(mem[addr], +=, utmp >> 8 * -~oprsz - tmp);
-				OF = (1 & (oprsz ? *(int16_t *) &newv : newv) >> 8 * -~oprsz - 1) ^ (CF = newv & 1);
+				OF = isneg(*(int16_t *) &newv) ^ (CF = newv & 1);
 				break;
 			case 1:/* ror */
 				utmp &= (1 << tmp) - 1;
 				POKE(mem[addr], +=, utmp << 8 * -~oprsz - tmp);
-				CF = !!(1 & (oprsz ? *(int16_t *) &newv : newv) >> 8 * -~oprsz - 1);
-				OF = (1 & (oprsz ? *(int16_t *) &newv * 2 : newv * 2) >> 8 * -~oprsz - 1) ^ CF;
+				CF = isneg(*(int16_t *) &newv);
+				OF = isneg(*(int16_t *) &newv * 2) ^ CF;
 				break;
 			case 2:/* rcl */
 				POKE(mem[addr], +=(CF << tmp - 1) +, utmp >> 1 + 8 * -~oprsz - tmp);
 				CF = !!(utmp & 1 << 8 * -~oprsz - tmp);
-				OF = (1 & (oprsz ? *(int16_t *) &newv : newv) >> 8 * -~oprsz - 1) ^ CF;
+				OF = isneg(*(int16_t *) &newv) ^ CF;
 				break;
 			case 3:/* rcr */
 				POKE(mem[addr], +=(CF << 8 * -~oprsz - tmp) +, utmp << 1 + 8 * -~oprsz - tmp);
 				CF = !!(utmp & 1 << tmp - 1);
-				OF = (1 & (oprsz ? *(int16_t *) &newv : newv) >> 8 * -~oprsz - 1) ^ (1 & (oprsz ? *(int16_t *) &newv * 2 : newv * 2) >> 8 * -~oprsz - 1);
+				OF = isneg(*(int16_t *) &newv) ^ isneg(*(int16_t *) &newv * 2);
 				break;
 			case 4:/* shl */
-				CF = !!(1 & (oprsz ? *(int16_t *) &oldv << tmp - 1 : oldv << tmp - 1) >> 8 * -~oprsz - 1);
-				OF = (1 & (oprsz ? *(int16_t *) &newv : newv) >> 8 * -~oprsz - 1) ^ CF;
+				CF = isneg(*(int16_t *) &oldv << tmp - 1);
+				OF = isneg(*(int16_t *) &newv) ^ CF;
 				break;
 			case 5:/* shr */
-				OF = (1 & (oprsz ? *(int16_t *) &oldv : oldv) >> 8 * -~oprsz - 1);
+				OF = isneg(*(int16_t *) &oldv);
 				break;
 			case 7:/* sar */
 				if (tmp >= 8 * -~oprsz)
@@ -554,10 +560,10 @@ main(int argc, char *argv[])
 			newv = AL &= 15;
 			break;
 		case 30:	/* cbw */
-			AH = -(1 & (oprsz ? *(int16_t *) r8 : AL) >> 8 * -~oprsz - 1);
+			AH = -isneg(AL);
 			break;
 		case 31:	/* cwd */
-			DX = -(1 & (oprsz ? *(int16_t *) r : AX) >> 8 * -~oprsz - 1);
+			DX = -isneg(AX);
 			break;
 		case 32:	/* callf */
 			push(CS);
@@ -662,7 +668,7 @@ main(int argc, char *argv[])
 			OF = CF = 0;
 		ip += (mode % 3 + 2 * !(!mode * o1a - 6)) * lookup(20, optype) + lookup(18, optype) - lookup(19, optype) * ~!!oprsz;
 		if (lookup(15, optype)) {
-			SF = (1 & (oprsz ? *(int16_t *) &newv : newv) >> 8 * -~oprsz - 1);
+			SF = isneg(*(int16_t *) &newv);
 			ZF = !newv;
 			PF = lookup(50, (uint8_t) newv);
 		}
