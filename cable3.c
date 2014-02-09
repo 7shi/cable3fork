@@ -158,7 +158,7 @@ main(int argc, char *argv[])
 	SDL_Surface *surface = NULL;
 
 	for (;;) {
-		if (!hassegpfx && !rep && kb && IF) {
+		if (!hassegpfx && !hasrep && kb && IF) {
 			intr(8);
 #ifdef _WIN32
 			if (kb = kbhit()) {
@@ -190,8 +190,8 @@ main(int argc, char *argv[])
 			opr = *(int16_t *) &p[4];
 		if (hassegpfx)
 			hassegpfx--;
-		if (rep)
-			rep--;
+		if (hasrep)
+			hasrep--;
 		uint32_t addr = modrm(mode, rm, disp), opr1, opr2;
 		getoprs(dir, reg, addr, &opr1, &opr2);
 		optype = lookup(51, b);
@@ -465,7 +465,7 @@ main(int argc, char *argv[])
 			}
 			break;
 		case 17:	/* movsb, movsw, stosb, stosw, lodsb, lodsw */
-			if (!rep || CX) {
+			if (!hasrep || CX) {
 				/* oprtype = 0, 1, 2 */
 				opr1 = oprtype < 2 ? 16 * ES + DI : ROMBASE;
 				opr2 = oprtype & 1 ? ROMBASE : 16 * r[hassegpfx ? segpfx : 11] + SI;
@@ -475,8 +475,8 @@ main(int argc, char *argv[])
 					SI += tmp;
 				if (!(oprtype & 2))
 					DI += tmp;
-				if (rep && --CX) {
-					rep++;
+				if (hasrep && --CX) {
+					hasrep++;
 					if (hassegpfx)
 						hassegpfx++;
 					ip--;
@@ -484,7 +484,7 @@ main(int argc, char *argv[])
 			}
 			break;
 		case 18:	/* cmpsb, cmpsw, scasb, scasw */
-			if (!rep || CX) {
+			if (!hasrep || CX) {
 				/* oprtype = 0, 1 */
 				opr1 = oprtype ? ROMBASE : 16 * r[hassegpfx ? segpfx : 11] + SI;
 				opr2 = 16 * ES + DI;
@@ -496,8 +496,8 @@ main(int argc, char *argv[])
 				if (!oprtype)
 					SI += tmp;
 				DI += tmp;
-				if (rep && --CX && !val == hasrep) {
-					rep++;
+				if (hasrep && --CX && !val == rep) {
+					hasrep++;
 					if (hassegpfx)
 						hassegpfx++;
 					ip--;
@@ -528,7 +528,7 @@ main(int argc, char *argv[])
 			POKE(ioport[oprtype ? DX : (int8_t) p[1]], =, AL);
 			break;
 		case 23:	/* repnz, repz */
-			rep = 2, hasrep = oprsz;
+			hasrep = 2, rep = oprsz;
 			if (hassegpfx)
 				hassegpfx++;
 			break;
@@ -543,8 +543,8 @@ main(int argc, char *argv[])
 		case 27:	/* es:, cs:, ss:, ds: */
 			/* oprtype = 8: ES, 9: CS, 10: SS, 11: DS */
 			hassegpfx = 2, segpfx = oprtype;
-			if (rep)
-				rep++;
+			if (hasrep)
+				hasrep++;
 			break;
 		case 28:	/* daa, das */
 			oprsz = 0;
