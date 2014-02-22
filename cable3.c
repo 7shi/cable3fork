@@ -256,9 +256,8 @@ main(int argc, char *argv[])
 			case 4:/* mul */
 				optype = 19;
 				if (oprsz) {
-					val = *(uint16_t *) &mem[addr] * (uint16_t) *r;
+					AX = val = *(uint16_t *) &mem[addr] * (uint16_t) *r;
 					DX = val >> 16;
-					AX = val;
 					OF = CF = !!(val - (uint16_t) val);
 				} else {
 					AX = val = *(uint8_t *) &mem[addr] * (uint8_t) *r8;
@@ -268,9 +267,8 @@ main(int argc, char *argv[])
 			case 5:/* imul */
 				optype = 19;
 				if (oprsz) {
-					val = *(int16_t *) &mem[addr] * (int16_t) *r;
+					AX = val = *(int16_t *) &mem[addr] * (int16_t) *r;
 					DX = val >> 16;
-					AX = val;
 					OF = CF = !!(val - (int16_t) val);
 				} else {
 					AX = val = *(int8_t *) &mem[addr] * (int8_t) *r8;
